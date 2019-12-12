@@ -11,6 +11,7 @@ import com.example.weatherappfromscratch.R;
 import com.example.weatherappfromscratch.model.Weather;
 import com.squareup.picasso.Picasso;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +36,7 @@ public class WeatherViewHolder extends RecyclerView.ViewHolder {
 
     }
 
-    public void onBind(final Weather weather) {
+    public void onBind(final Weather weather) throws ParseException {
         dateTv.setText(weather.getDateTimeISO());
 
 

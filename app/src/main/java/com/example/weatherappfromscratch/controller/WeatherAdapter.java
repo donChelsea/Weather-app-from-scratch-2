@@ -11,6 +11,7 @@ import com.example.weatherappfromscratch.R;
 import com.example.weatherappfromscratch.model.Weather;
 import com.example.weatherappfromscratch.view.WeatherViewHolder;
 
+import java.text.ParseException;
 import java.util.List;
 
 public class WeatherAdapter extends RecyclerView.Adapter<WeatherViewHolder> {
@@ -32,7 +33,11 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull WeatherViewHolder weatherViewHolder, int i) {
-        weatherViewHolder.onBind(weatherList.get(i));
+        try {
+            weatherViewHolder.onBind(weatherList.get(i));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
