@@ -35,19 +35,26 @@ public class WeatherViewHolder extends RecyclerView.ViewHolder {
 
     }
 
-    public void onBind(Weather weather) {
+    public void onBind(final Weather weather) {
         dateTv.setText(weather.getDateTimeISO());
-        maxTempTv.setText(String.format("Max temp: %s F", weather.getMaxTempF()));
-        minTempTv.setText(String.format("Min temp: %s F", weather.getMinTempF()));
+
 
         weatherIconsList = new ArrayList<>(Arrays.asList(R.drawable.rain, R.drawable.snow, R.drawable.sunny, R.drawable.tstorm, R.drawable.wind, R.drawable.wintrymix));
         Random rand = new Random();
         Picasso.get().load(weatherIconsList.get(rand.nextInt(weatherIconsList.size()))).into(weatherIconIv);
 
-        if (aSwitch.isChecked()) {
-            maxTempTv.setText(String.format("Max temp: %s C", weather.getMaxTempC()));
-            minTempTv.setText(String.format("Max temp: %s C", weather.getMinTempC()));
-            notify();
-        }
+        aSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (aSwitch.isChecked()) {
+                    maxTempTv.setText(String.format("Max temp: %s C", weather.getMaxTempC()));
+                    minTempTv.setText(String.format("Max temp: %s C", weather.getMinTempC()));
+                } else {
+                    maxTempTv.setText(String.format("Max temp: %s F", weather.getMaxTempF()));
+                    minTempTv.setText(String.format("Min temp: %s F", weather.getMinTempF()));
+                }
+            }
+        });
+
     }
 }
