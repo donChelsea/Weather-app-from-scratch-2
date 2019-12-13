@@ -15,6 +15,11 @@ import com.example.weatherappfromscratch.network.WeatherService;
 
 import java.util.List;
 
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -22,7 +27,7 @@ import retrofit2.Retrofit;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "main activity";
-    private Retrofit retrofit;
+    private Disposable retrofit;
     private RecyclerView recyclerView;
 
     @Override
@@ -32,22 +37,24 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recycler_view);
 
-        retrofit = RetrofitSingleton.getInstance();
-        WeatherService weatherService = retrofit.create(WeatherService.class);
-        Call<ResponseList> responseCall = weatherService.getResponseList();
-        responseCall.enqueue(new Callback<ResponseList>() {
-            @Override
-            public void onResponse(Call<ResponseList> call, Response<ResponseList> response) {
-                List<Weather> weatherList = response.body().getResponse().get(0).getWeatherList();
-                recyclerView.setAdapter(new WeatherAdapter(getApplicationContext(), weatherList));
-                recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-            }
-
-            @Override
-            public void onFailure(Call<ResponseList> call, Throwable t) {
-                Log.d(TAG, "on failure: " + t.getMessage());
-            }
-        });
+        retrofit = RetrofitSingleton.getInstance()
+                .create(WeatherService.class)
+                .getResponseList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<ResponseList>() {
+                    @Override
+                    public void accept(ResponseList responseList) throws Exception {
+                        List<Weather> weatherList = responseList.getResponse().get(0).getWeatherList();
+                        recyclerView.setAdapter(new WeatherAdapter(getApplicationContext(), weatherList));
+                        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.d(TAG, "on failure: " + throwable.getMessage());
+                    }
+                });
 
     }
 }
